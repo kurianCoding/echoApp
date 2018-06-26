@@ -3,8 +3,9 @@ package models
 //TODO:define a function for login
 
 type User struct {
-	Name       string
-	Email      string
+	UserName   string `validate:"required"`
+	Email      string `validate:"email,required"`
+	Phone      string
 	Password   string
 	DBPassword string
 }
@@ -23,6 +24,9 @@ func DoLogin(user *User) (bool, error) {
 	//TODO: return true if OK
 	return true, nil
 }
+
+// GetUser... will make a query to database, and return a User struct with all its
+// atrributes filled
 func GetUser(name, email string) (*User, error) {
 
 }
