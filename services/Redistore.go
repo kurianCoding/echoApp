@@ -35,6 +35,10 @@ type RedisStore struct {
 	Conn *redis.Pool // connects more than one connection and is cebtrally managed
 }
 
-func (*RedisStore) Get(r *http.Request, name string) (*sessions.Session, error)  { return nil, nil }
-func (*RedisStore) Save(r *http.Request, name string) (*sessions.Session, error) { return nil, nil }
-func (*RedisStore) New(r *http.Request, name string) (*sessions.Session, error)  { return nil, nil }
+func (*RedisStore) Get(r *http.Request, name string) (*sessions.Session, error) { return nil, nil }
+func (*RedisStore) Save(r *http.Request, w http.ResponseWriter, ses *sessions.Session) error {
+	return nil
+}
+func (*RedisStore) New(r *http.Request, name string) (*sessions.Session, error) {
+	return nil, nil
+}
