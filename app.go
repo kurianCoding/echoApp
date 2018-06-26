@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/kurianCoding/echoApp/services"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	//"github.com/shomali11/xredis"
 	"io"
 	"net/http"
 	"os"
@@ -18,7 +20,8 @@ func main() {
 	router := echo.New()
 
 	LogFile, err := os.OpenFile(fmt.Sprintf("%s/%s/%s", APP_STORAGE, APP_NAME, ERROR_LOG), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	defer LogFile.Close()
+	_, err = services.NewRedisStore() // redis connection is made here
+	defer func() { LogFile.Close() }()
 
 	if err != nil {
 		panic(err)
