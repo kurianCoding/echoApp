@@ -23,10 +23,6 @@ func NewRedisStore() (*RedisStore, error) {
 		MaxIdle:     MAX_REDIS_IDLE_CONNECTIONS,
 		IdleTimeout: 3 * time.Second,
 	}
-	//redisConn, err := redis.Dial("tcp", fmt.Sprintf("%s:%s", REDIS_HOST, REDIS_PORT))
-	/*if err != nil {
-		return nil, err
-	}*/
 	fmt.Printf("Redis connected at %s:%s", REDIS_HOST, REDIS_PORT)
 	return &RedisStore{Conn: pool}, nil
 }
@@ -35,10 +31,19 @@ type RedisStore struct {
 	Conn *redis.Pool // connects more than one connection and is cebtrally managed
 }
 
-func (*RedisStore) Get(r *http.Request, name string) (*sessions.Session, error) { return nil, nil }
-func (*RedisStore) Save(r *http.Request, w http.ResponseWriter, ses *sessions.Session) error {
+func (rd *RedisStore) Get(r *http.Request, name string) (*sessions.Session, error) {
+	activeConnection := rd.Conn.Get() //gets new redis connection from connection pool
+	uniqueKey := getUniqueKey(r, name)
+	reSes, err := activeConnection.Do("GET", uniqueKey) // gets a session from redis
+	if err != nil {
+		return nil, err
+	}
+	return sessions.Session(reSes.(sessions.Session)), nil
+}
+func (rd *RedisStore) Save(r *http.Request, w http.ResponseWriter, ses *sessions.Session) error {
 	return nil
 }
-func (*RedisStore) New(r *http.Request, name string) (*sessions.Session, error) {
+func (rd *RedisStore) New(r *http.Request, name string) (*sessions.Session, error) {
 	return nil, nil
 }
+func getUniqueKey(r *http.Request, name string) string { return "" }
