@@ -1,6 +1,7 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/sessions"
@@ -33,17 +34,46 @@ type RedisStore struct {
 
 func (rd *RedisStore) Get(r *http.Request, name string) (*sessions.Session, error) {
 	activeConnection := rd.Conn.Get() //gets new redis connection from connection pool
-	uniqueKey := getUniqueKey(r, name)
-	reSes, err := activeConnection.Do("GET", uniqueKey) // gets a session from redis
+	defer activeConnection.Close()    //closes the redis connection and returns the resource
+	// to pool
+	uniqueKey := getCookie(r)
+	reSes, err := rd.getSessionData(uniqueKey) // gets a session from redis
 	if err != nil {
 		return nil, err
 	}
-	return sessions.Session(reSes.(sessions.Session)), nil
+	ses := &sessions.Session{}
+	err = json.Unmarshall([]byte(rSes), ses)
+	if err != nil {
+		return nil, err
+	}
+
+	return ses, nil
 }
 func (rd *RedisStore) Save(r *http.Request, w http.ResponseWriter, ses *sessions.Session) error {
+	//uniqueKey := getUniqueKey(r, name)
+	// set the unique session Id in the session ID feild, get the session.ID and store
+	// it with hat as the key
+
 	return nil
 }
 func (rd *RedisStore) New(r *http.Request, name string) (*sessions.Session, error) {
+	//TODO: clear old session if it exists
+	//TODO: get new session key, add this to session.Session.ID
+
 	return nil, nil
+}
+func (rd *RedisStore) Remove(r *http.Request) error {
+	//TODO: clear the session ID-Data pair from redis
+	//TODO: clear the session key-ID pair from redis
+	return nil
+}
+func (rd *RedisStore) getSesssionData(uniqueKey string) (string, error) {
+	sessionId, err := activeConnection.Do("GET", uniqueKey)     // gets a session from redis
+	sessionData, err := activeConnection.Do("GET", sessionData) // gets a session from redis
+	return sessionData, err
+}
+func getCookie(r *http.Request) string {
+	// TODO: get cookie from request and store it as unique key
+	return ""
 }
 func getUniqueKey(r *http.Request, name string) string { return "" }
