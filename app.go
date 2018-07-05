@@ -11,9 +11,9 @@ import (
 	"os"
 )
 
-var APP_STORAGE = "storage"
-var APP_NAME = "EchoApp"
-var ERROR_LOG = "AppError.log"
+var APP_STORAGE = "temp"
+var APP_NAME = "logs"
+var ERROR_LOG = "App.log"
 
 func main() {
 	//TODO: write a router init
