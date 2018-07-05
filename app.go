@@ -41,7 +41,7 @@ func main() {
 		c.JSON(http.StatusOK, map[string]string{"health": "OK"})
 		return nil
 	})
-	router.GET("/redirect", func(c echo.Context) error { return nil }, middleware.HTTPSRedirect())
+	//router.GET("/redirect", func(c echo.Context) error { return nil }, middleware.HTTPSRedirect())
 	//TODO: write a log init
 	//TODO: write a db connection init
 	//TODO: gracefully close the server with a defer functino

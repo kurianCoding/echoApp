@@ -37,12 +37,12 @@ func (rd *RedisStore) Get(r *http.Request, name string) (*sessions.Session, erro
 	defer activeConnection.Close()    //closes the redis connection and returns the resource
 	// to pool
 	uniqueKey := getCookie(r)
-	reSes, err := rd.getSessionData(uniqueKey) // gets a session from redis
+	rSes, err := rd.getSessionData(uniqueKey) // gets a session from redis
 	if err != nil {
 		return nil, err
 	}
 	ses := &sessions.Session{}
-	err = json.Unmarshall([]byte(rSes), ses)
+	err = json.Unmarshal([]byte(rSes.([]byte)), ses)
 	if err != nil {
 		return nil, err
 	}
@@ -67,9 +67,10 @@ func (rd *RedisStore) Remove(r *http.Request) error {
 	//TODO: clear the session key-ID pair from redis
 	return nil
 }
-func (rd *RedisStore) getSesssionData(uniqueKey string) (string, error) {
-	sessionId, err := activeConnection.Do("GET", uniqueKey)     // gets a session from redis
-	sessionData, err := activeConnection.Do("GET", sessionData) // gets a session from redis
+func (rd *RedisStore) getSessionData(uniqueKey string) (interface{}, error) {
+	activeConnection := rd.Conn.Get()                         //gets new redis connection from connection pool
+	sessionId, err := activeConnection.Do("GET", uniqueKey)   // gets a session from redis
+	sessionData, err := activeConnection.Do("GET", sessionId) // gets a session from redis
 	return sessionData, err
 }
 func getCookie(r *http.Request) string {
